@@ -1,7 +1,7 @@
 <div align="center">
-<table width="794" bgcolor="#ffffff">
-<tr bgcolor="#ffffff">
-<td align="left" bgcolor="#ffffff"><font color="#111111">
+<table width="794" bgcolor="#ffffff" background="assets/readme-white.png">
+<tr bgcolor="#ffffff" background="assets/readme-white.png">
+<td align="left" bgcolor="#ffffff" background="assets/readme-white.png" color="#111111">
 
 <img src="assets/readme-header.png" width="100%" alt="CN Blue CV">
 
@@ -47,7 +47,7 @@ node scripts/html2pdf.mjs</code></pre>
 
 <img src="assets/readme-footer.png" width="100%" alt="yanboch@126.com · jodyblue · boshikage">
 
-</font></td>
+</td>
 </tr>
 </table>
 </div>
