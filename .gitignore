@@ -9,3 +9,6 @@ cv-info.md
 # Preview / PDF toolchain
 node_modules/
 output/
+
+# Dev
+TODO.md

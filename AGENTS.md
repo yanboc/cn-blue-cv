@@ -10,7 +10,7 @@
 
 约定用法（**本地 clone**）：**用户填空 → agent 把模块全写进第一页 → 用户在预览里改到满意 → 再出 PDF**。网页也可在**侧栏按块填空**（点模块展开第二层），不点纸面编辑。本地可多页：拆页交给 `web/js/app.js`，agent 不要手拆。「排进第一页」不是整份简历只能一页。agent 负责别编造、别抢着分页、别把隐私推进 git。好看与否以预览为准，不以 agent 想象的「专业简历」为准。
 
-**在线演示**固定一页（试版式）：[https://yanboc.github.io/yanboc-cv/](https://yanboc.github.io/yanboc-cv/)。线上改动只在用户自己的浏览器里，不写回仓库。多页必须本地预览，见 [README.md](README.md)。
+**在线演示**固定一页（试版式）：[https://yanboc.github.io/cn-blue-cv/](https://yanboc.github.io/cn-blue-cv/)。线上改动只在用户自己的浏览器里，不写回仓库。多页必须本地预览，见 [README.md](README.md)。
 
 ### 去哪找资源
 
@@ -23,7 +23,8 @@
 | 用户确认后怎么落到文件         | [docs/checklist-mapping.md](docs/checklist-mapping.md)                |
 | 模块 HTML 骨架          | [docs/module-commands.md](docs/module-commands.md)                    |
 | `cv-config.json` 字段 | [docs/config-reference.md](docs/config-reference.md)                  |
-| 用户怎么预览 / 改学校和字体     | [README.md](README.md)                                                |
+| 用户怎么预览              | [README.md](README.md)                                                |
+| 改学校、字体、主题色          | [docs/config-reference.md](docs/config-reference.md)                  |
 
 
 仓内位置（日常就这几个）：
@@ -111,7 +112,7 @@ node scripts/html2pdf.mjs
 
 - 纸张就是 A4：`210mm × 297mm`，`@page { size: A4; margin: 0 }`
 - 不要斜体；强调用 `<strong>` 或 `<u>`
-- 默认页眉页脚是**图片**，改 `themeColor` 几乎看不出纹路变色。要纯色条再关 `useDefaultTheme`
+- 默认页眉页脚是**纯色**，颜色跟 `themeColor`（默认 `#002554`）。要纹路图片再把 `useDefaultTheme` 设为 `true`
 - 默认字体是狮尾四季春（`web/fonts/`，OFL）。用户要系统字体再把 `useDefaultFont` 设为 `true`
 - 新模块继续用 `.module` + `.module-title`，别发明第二套布局
 

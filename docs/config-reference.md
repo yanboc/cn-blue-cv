@@ -12,6 +12,8 @@
 | `departmentNameCH` / `headerMajor` | 页眉右侧「学院 \| 专业」 | |
 | `headerDeptMode` | `auto` 跟最高学历；`manual` 用手填的学院/专业 | `auto` |
 
+侧栏「页眉」可选武大、华科、武理，或「上传…」「不展示校徽」。再加一所学校：在 `web/js/app.js` 的 `SCHOOL_LOGOS` 加一行，白底或透明底图放到 `web/images/logos/`。
+
 ## 联系方式
 
 | 键 | 说明 | 默认 |
@@ -45,14 +47,16 @@ Agent 写入 HTML 时，开关为 false 的模块不要输出。
 
 | 键 | 说明 | 默认 |
 | --- | --- | --- |
-| `useDefaultTheme` | true = 图片页眉页脚（`images/header.png` `footer.png`），改色几乎无效 | true |
+| `useDefaultTheme` | false = 纯色页眉页脚，颜色跟 `themeColor`；true = 图片纹路（`images/header.png` `footer.png`） | false |
 | `schoolLogo` | 校徽路径、预设文件或本机 data URL | 空；选预设后写入 `images/logos/…` |
 | `needWatermark` `watermarkImage` `watermarkOpacity` | 水印 | false / 0.03 |
 | `themeColor` | `#RRGGBB` | `#002554` |
 | `useDefaultFont` | true = 系统字体；false = `web/fonts/` 狮尾四季春 | false |
 | `fontFamily` | 自定义字体族名（与文件名对应） | `SweiSpring` |
-| `rhythm` | 行距预设 `E` 选定 / `A` 密 / `B` 中 / `C` 疏 / `D` 对比 | **`E`**（行 1.30＝C，段 0.75em / 块 1.55em＝B） |
+| `demoFill` | true 时按阶段和用途填入占位指引 | `true` |
 | `space` | 覆盖预设：`{ line, para, block, title }` | 一般不填 |
+
+自行换字体：把 ttf 放到 `web/fonts/`，并改 `web/css/cv.css` 里的 `@font-face`。许可见 [狮尾四季春（SweiSpring）](https://github.com/max32002/swei-spring)（OFL）。
 
 ### 行 / 段 / 块（改间距只动这三项）
 

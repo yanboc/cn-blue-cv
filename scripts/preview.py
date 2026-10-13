@@ -140,7 +140,7 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="yanboc-cv 本地预览")
+    parser = argparse.ArgumentParser(description="cn-blue-cv 本地预览")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8765)
     parser.add_argument("--no-open", action="store_true", help="不自动打开浏览器")

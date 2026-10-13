@@ -192,6 +192,18 @@ body.hud-fill-open { --hud-w: calc(var(--hud-rail) + var(--hud-pane)); }
   flex-direction: column;
   gap: 8px;
 }
+
+.hud-entry.is-drag { cursor: grab; }
+
+.hud-entry.is-over { outline: 1px dashed #8aa0c8; outline-offset: 1px; }
+
+.hud-drag {
+  flex: none;
+  width: 10px;
+  height: 14px;
+  cursor: grab;
+  background: repeating-linear-gradient(to bottom, #8d8d8d 0 2px, transparent 2px 4px);
+}
 .hud-entry-bar {
   display: flex;
   justify-content: space-between;
@@ -568,10 +580,46 @@ body.cv-packing .page {
 
 .meta { white-space: nowrap; }
 
+.module[data-module="personal"] {
+  display: grid;
+  grid-template-columns: 1fr 22mm;
+  column-gap: 1.4em;
+  align-items: stretch;
+}
+
+.module[data-module="personal"] > .module-title {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.module[data-module="personal"] > .info-wrap {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.module[data-module="personal"] > .avatar {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22mm;
+  min-height: 0;
+  height: auto;
+  overflow: hidden;
+  border: none;
+  background: transparent;
+}
+
 .info-wrap {
   display: flex;
   gap: 1.4em;
   align-items: flex-start;
+}
+
+.module[data-module="personal"] > .info-wrap {
+  display: block;
 }
 
 .info-table {
@@ -612,19 +660,40 @@ body.cv-packing .page {
 .avatar {
   width: 22mm;
   flex: none;
-  border: 3px double #222;
   cursor: pointer;
   position: relative;
 }
 
-.avatar img { display: block; width: 100%; height: auto; }
+.avatar img {
+  display: block;
+  width: 100%;
+  height: auto;
+  box-sizing: border-box;
+  border: 3px double #222;
+}
+
+.module[data-module="personal"] .avatar img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
 
 .avatar.is-empty {
   min-height: 28mm;
+  border: 3px double #222;
   background: #f7f7f7;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.module[data-module="personal"] .avatar.is-empty {
+  min-height: 0;
+  height: auto;
+  align-self: stretch;
 }
 
 .avatar.is-empty img { display: none; }

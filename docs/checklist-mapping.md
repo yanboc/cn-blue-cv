@@ -39,7 +39,7 @@ Agent 在用户确认 `cv-info.md` 后，按本表写入 `web/cv-config.json` �
 | 页眉校徽 | `schoolLogoId`：`whu` 武大 / `hust` 华科 / `wut` 武理 / `upload` 上传 / `none` 不展示 |
 | 是否显示头像 | `needAvatar` |
 | 是否显示水印 | `needWatermark` |
-| 默认主题页眉页脚 | `useDefaultTheme` |
+| 默认主题页眉页脚 | `useDefaultTheme`：否 = 纯色条（默认）；是 = 图片纹路 |
 | 主题色 | `themeColor`（`#RRGGBB`；默认 `#002554`） |
 | 字体 | 空或狮尾 → `useDefaultFont: false`；系统字体 → `true` |
 

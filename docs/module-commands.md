@@ -19,24 +19,24 @@
 
 ```html
 <section class="module" data-module="personal">
-  <h2 class="module-title"><span class="icon icon-card"></span>个人信息</h2>
+  <h2 class="module-title"><i class="fa-solid fa-id-card" aria-hidden="true"></i>个人信息</h2>
   <div class="info-wrap">
     <table class="info-table">
       <tr>
-        <td class="label">姓　　名:</td><td data-bind="name">…</td>
-        <td class="label">所在城市:</td><td data-bind="city">…</td>
+        <td class="label"><span data-info-label>姓名</span>:</td><td data-bind="name">姓名</td>
+        <td class="label"><span data-info-label>所在城市</span>:</td><td data-bind="city">城市</td>
       </tr>
       <tr>
-        <td class="label">出生年月:</td><td data-bind="birthdate">…</td>
-        <td class="label">联系方式:</td><td data-bind="contact">…</td>
+        <td class="label"><span data-info-label>出生年月</span>:</td><td data-bind="birthdate">YYYY.MM</td>
+        <td class="label"><span data-info-label>联系方式</span>:</td><td data-bind="contact">手机或邮箱</td>
       </tr>
     </table>
-    <div class="avatar" data-avatar hidden><img src="images/avatar.png" alt="头像"></div>
   </div>
+  <div class="avatar is-empty" data-avatar><img alt="证件照"></div>
 </section>
 ```
 
-`needAvatar: true` 时去掉 `hidden`。
+证件照与标题、信息表并排，标题下划线只画在左列。照片按个人信息块上下边界自适应缩放、上下居中。空格是指导字；配置里有值才覆盖。`needAvatar: false` 时隐藏照片框。
 
 ## 教育背景 — `data-module="education"`
 
@@ -99,10 +99,8 @@
 <section class="module skills" data-module="skills">
   <h2 class="module-title"><span class="icon icon-wrench"></span>技能特长</h2>
   <ul>
-    <li><strong>英语</strong>：…</li>
-    <li><strong>编程</strong>：…
-      <ul class="nested"><li>子项</li></ul>
-    </li>
+    <li><strong>语言</strong>：如英语</li>
+    <li><strong>工具</strong>：如 Python</li>
   </ul>
 </section>
 ```
@@ -129,7 +127,7 @@
 
 ```html
 <ul>
-  <li><strong>标题</strong>：正文，可用嵌套 ul/ol 与 <a href="…">链接</a></li>
+  <li data-f="text">主页 / 可公开说明</li>
 </ul>
 ```
 

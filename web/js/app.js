@@ -92,8 +92,8 @@ function overflows(body) {
   return body.scrollHeight - body.clientHeight > 1;
 }
 
-const STORE_PAGES = "yanboc-cv-pages-v2";
-const STORE_CONFIG = "yanboc-cv-config-v2";
+const STORE_PAGES = "yanboc-cv-pages-v3";
+const STORE_CONFIG = "yanboc-cv-config-v3";
 
 function hasLocalApi() {
   const h = location.hostname;
@@ -116,33 +116,109 @@ const PERSONAL_DEFAULTS = [
   { label: "联系方式", bind: "contact" },
 ];
 
+const PERSONAL_HINT = {
+  name: "姓名",
+  city: "城市",
+  birthdate: "YYYY.MM",
+  contact: "手机或邮箱",
+};
+
+function personalHint(bind, label) {
+  return PERSONAL_HINT[bind] || label || "栏目";
+}
+
+function isPersonalHint(bind, label, value) {
+  const v = String(value || "").trim();
+  return !v || v === personalHint(bind, label);
+}
+
 function titleIcon(fa, text) {
   return `<h2 class="module-title"><i class="fa-solid ${fa}" aria-hidden="true"></i>${text}</h2>`;
 }
 
-function personalHtml() {
+function personalStatus(stage, purpose) {
+  if (purpose === "求职") {
+    if (stage === "本科") return "应届本科，正在求职";
+    if (stage === "硕士") return "应届硕士，正在求职";
+    if (stage === "博士") return "应届博士，正在求职";
+    return "正在求职";
+  }
+  if (stage === "本科") return "本科在读";
+  if (stage === "硕士") return "硕士在读";
+  if (stage === "博士") return "博士在读";
+  return "在读或求职";
+}
+
+function personalHtml(stage, purpose) {
+  const interest = purpose === "求职" ? "你的求职方向" : "你的研究方向";
   return `<section class="module" data-module="personal">
     ${titleIcon("fa-id-card", "个人信息")}
     <div class="info-wrap">
       <table class="info-table">
         <tr>
-          <td class="label"><span data-info-label>姓名</span>:</td><td data-bind="name"></td>
-          <td class="label"><span data-info-label>所在城市</span>:</td><td data-bind="city"></td>
+          <td class="label"><span data-info-label>姓名</span>:</td><td data-bind="name">某某</td>
+          <td class="label"><span data-info-label>所在城市</span>:</td><td data-bind="city">你的城市</td>
         </tr>
         <tr>
-          <td class="label"><span data-info-label>出生年月</span>:</td><td data-bind="birthdate"></td>
-          <td class="label"><span data-info-label>联系方式</span>:</td><td data-bind="contact"></td>
+          <td class="label"><span data-info-label>出生年月</span>:</td><td data-bind="birthdate">2000.01</td>
+          <td class="label"><span data-info-label>联系方式</span>:</td><td data-bind="contact">你的手机或邮箱</td>
+        </tr>
+        <tr>
+          <td class="label"><span data-info-label>当前状态</span>:</td><td>${escHtml(personalStatus(stage, purpose))}</td>
+          <td class="label"><span data-info-label>研究兴趣</span>:</td><td>${escHtml(interest)}</td>
         </tr>
       </table>
-      <div class="avatar is-empty" data-avatar><img alt="证件照"></div>
     </div>
+    <div class="avatar" data-avatar><img src="images/profile.jpg" alt="证件照"></div>
   </section>`;
 }
 
 function eduEntry(degree) {
+  const spec = {
+    本科: {
+      school: "某某大学",
+      loc: "某某市",
+      college: "某某学院",
+      major: "某某专业",
+      dates: "2020.09 – 2024.06",
+      note: "主修某某。毕业设计是某某系统。",
+    },
+    硕士: {
+      school: "某某大学",
+      loc: "某某市",
+      college: "某某学院",
+      major: "某某专业",
+      dates: "2024.09 – 2027.06",
+      note: "研究方向是某某，跟随某某老师做课题。",
+    },
+    博士: {
+      school: "某某大学",
+      loc: "某某市",
+      college: "某某学院",
+      major: "某某专业",
+      dates: "2022.09 – 2027.06",
+      note: "导师某某。课题是某某方向上的一个具体问题。",
+    },
+    学位: {
+      school: "某某大学",
+      loc: "某某市",
+      college: "某某学院",
+      major: "某某专业",
+      dates: "20XX.09 – 20XX.06",
+      note: "用一两句话写下这段学历。",
+    },
+  }[degree] || {
+    school: "某某大学",
+    loc: "某某市",
+    college: "某某学院",
+    major: "某某专业",
+    dates: "20XX.09 – 20XX.06",
+    note: "用一两句话写下这段学历。",
+  };
   return `<article class="entry">
-    <div class="spread"><div><strong class="lg" data-f="school">学校</strong>，<span data-f="degree">${escHtml(degree)}</span></div><div class="meta" data-f="location">位置</div></div>
-    <div class="spread"><div><u data-f="college">学院</u>，专业：<span data-f="major">专业名</span></div><div class="meta" data-f="dates">起止时间</div></div>
+    <div class="spread"><div><strong class="lg" data-f="school">${escHtml(spec.school)}</strong>，<span data-f="degree">${escHtml(degree)}</span></div><div class="meta" data-f="location">${escHtml(spec.loc)}</div></div>
+    <div class="spread"><div><u data-f="college">${escHtml(spec.college)}</u>，专业：<span data-f="major">${escHtml(spec.major)}</span></div><div class="meta" data-f="dates">${escHtml(spec.dates)}</div></div>
+    ${noteBlock(spec.note)}
   </article>`;
 }
 
@@ -150,60 +226,210 @@ function educationHtml(stage) {
   const rows =
     stage === "博士" ? eduEntry("本科") + eduEntry("博士") :
     stage === "硕士" ? eduEntry("本科") + eduEntry("硕士") :
-    eduEntry(stage === "本科" ? "本科" : "学位");
+    stage === "本科" ? eduEntry("本科") :
+    eduEntry("学位") + eduEntry("本科");
   return `<section class="module" data-module="education">${titleIcon("fa-graduation-cap", "教育背景")}${rows}</section>`;
 }
 
-function publicationHtml() {
-  return `<section class="module" data-module="publication">
-    ${titleIcon("fa-book", "科研成果")}
-    <article class="entry">
-      <div data-f="title">论文标题</div>
-      <div class="spread"><div><strong data-f="authors">姓名</strong></div><div><span class="pub-venue" data-f="venue">会议/期刊</span>（<span data-f="status">状态</span>）</div></div>
-    </article>
-  </section>`;
+function pubEntry(title, authors, venue, status, note) {
+  return `<article class="entry">
+    <div data-f="title">${escHtml(title)}</div>
+    <div class="spread"><div><strong data-f="authors">${escHtml(authors)}</strong></div><div><span class="pub-venue" data-f="venue">${escHtml(venue)}</span>（<span data-f="status">${escHtml(status)}</span>）</div></div>
+    ${noteBlock(note)}
+  </article>`;
 }
 
-function projectsHtml(kind) {
-  const label = kind === "求职" ? "项目或实习名称" : "项目名称";
-  return `<section class="module" data-module="projects">
-    ${titleIcon("fa-screwdriver-wrench", "项目与实习")}
-    <article class="entry">
-      <div class="spread"><div><strong class="lg" data-f="name">${escHtml(label)}</strong></div><div class="meta" data-f="kind">类型</div></div>
-      <div class="spread"><div><strong data-f="role">角色</strong></div><div class="meta" data-f="dates">起止时间</div></div>
-    </article>
-  </section>`;
+function demoPubs(stage) {
+  const author = "某某";
+  const doctoral = [
+    pubEntry(
+      "A Research On Some Good Topics",
+      `${author}, A. Coauthor`,
+      "Some Journal",
+      "已发表",
+      "针对一个常见问题提出一种方法，并在公开数据上做了对比。"
+    ),
+    pubEntry(
+      "A Follow-Up On The Same Topic",
+      author,
+      "Some Conference",
+      "已接收",
+      "把上一篇的方法用到另一组数据上。"
+    ),
+    pubEntry(
+      "A Short Note On An Old Question",
+      author,
+      "Some Workshop",
+      "在投",
+      "记录了一个小观察，实验还在补充。"
+    ),
+    pubEntry(
+      "A Survey Of Familiar Methods",
+      author,
+      "Some Journal",
+      "在投",
+      "按使用场景整理了常见做法。"
+    ),
+  ];
+  const master = [
+    pubEntry(
+      "A Study Of Something Useful",
+      author,
+      "Some Conference",
+      "已发表",
+      "围绕一个具体问题做了实验，并和常见基线比较。"
+    ),
+    pubEntry(
+      "A Small Paper On A Course Topic",
+      `${author}, B. Coauthor`,
+      "Some Workshop",
+      "已接收",
+      "把课程里的题目做成了一篇短文。"
+    ),
+    doctoral[0],
+  ];
+  const bachelor = [
+    pubEntry(
+      "A Course Paper On A Textbook Topic",
+      author,
+      "课程论文",
+      "已完成",
+      "按课程要求复现了一个经典方法。"
+    ),
+  ];
+  if (stage === "本科") return bachelor;
+  if (stage === "硕士") return master;
+  return doctoral;
 }
 
-function skillsHtml() {
-  return `<section class="module skills" data-module="skills">
-    ${titleIcon("fa-wrench", "技能特长")}
-    <ul>
-      <li><strong data-f="label">语言</strong>：<span data-f="value">在此填写</span></li>
-      <li><strong data-f="label">工具</strong>：<span data-f="value">在此填写</span></li>
-    </ul>
-  </section>`;
+function publicationHtml(stage, purpose) {
+  const keys = modulesFor(stage, purpose);
+  const n = keys.length;
+  const dense = keys.includes("projects") && keys.includes("publication");
+  const all = demoPubs(stage);
+  const take = dense ? 2 : keys.includes("honors") ? 3 : n >= 6 ? 2 : n >= 5 ? 4 : 5;
+  return `<section class="module" data-module="publication">${titleIcon("fa-book", "科研成果")}${all.slice(0, take).join("")}</section>`;
+}
+
+function projEntry(name, kind, role, dates, note) {
+  return `<article class="entry">
+    <div class="spread"><div><strong class="lg" data-f="name">${escHtml(name)}</strong></div><div class="meta" data-f="kind">${escHtml(kind)}</div></div>
+    <div class="spread"><div><strong data-f="role">${escHtml(role)}</strong></div><div class="meta" data-f="dates">${escHtml(dates)}</div></div>
+    ${noteBlock(note)}
+  </article>`;
+}
+
+function demoProjs(job) {
+  if (job) {
+    return [
+      projEntry("某某公司", "实习", "某某岗位", "2025.06 – 2025.09", "参与某某功能的开发与测试。"),
+      projEntry("某某课程项目", "课设", "负责人", "2024.03 – 2024.06", "独立完成了一个可演示的小系统。"),
+      projEntry("某某志愿项目", "实践", "成员", "2023.07 – 2023.08", "负责资料整理和现场协助。"),
+      projEntry("某某校园实践", "实践", "组长", "2023.03 – 2023.06", "组织了一次小型调研，并写了总结。"),
+    ];
+  }
+  return [
+    projEntry("某某课题", "科研", "研究助理", "2024.09 – 2025.06", "负责数据整理和一部分实验。"),
+    projEntry("某某开源项目", "开源", "贡献者", "2024 – 今", "修过文档，也提交过几处小改动。"),
+    projEntry("某某研讨班", "课程", "参与者", "2024.09 – 2025.01", "读过若干篇论文，并做过一次报告。"),
+    projEntry("某某课程项目", "课设", "成员", "2024.03 – 2024.06", "完成了课程要求的一个小系统。"),
+  ];
+}
+
+function projectsHtml(stage, purpose) {
+  const keys = modulesFor(stage, purpose);
+  const n = keys.length;
+  const dense = keys.includes("publication");
+  const all = demoProjs(purpose === "求职");
+  const take = n >= 6 ? 3 : dense && keys.includes("others") ? 2 : dense || n >= 5 ? 3 : 5;
+  return `<section class="module" data-module="projects">${titleIcon("fa-screwdriver-wrench", "项目与实习")}${all.slice(0, take).join("")}</section>`;
+}
+
+function skillsHtml(stage, purpose) {
+  const n = modulesFor(stage, purpose).length;
+  const lines = purpose === "求职"
+    ? [
+        ["语言", "中文、英文"],
+        ["工具", "Python、Git"],
+        ["方向", "你的求职方向"],
+        ["证书", "某某证书"],
+        ["办公", "常用办公软件"],
+      ]
+    : [
+        ["语言", "中文、英文"],
+        ["工具", "Python、LaTeX"],
+        ["方向", "你的研究方向"],
+        ["实验", "能独立完成一组对比实验"],
+        ["写作", "能写清问题、方法和结果"],
+      ];
+  const take = n >= 6 ? 4 : 7;
+  const items = lines
+    .slice(0, take)
+    .map(([k, v]) => `<li><strong data-f="label">${k}</strong>：<span data-f="value">${v}</span></li>`)
+    .join("");
+  return `<section class="module skills" data-module="skills">${titleIcon("fa-wrench", "技能特长")}<ul>${items}</ul></section>`;
 }
 
 function competitionsHtml() {
   return `<section class="module" data-module="competitions">
     ${titleIcon("fa-trophy", "竞赛经历")}
-    <table class="comp-table"><tr><td data-f="name">竞赛名称</td><td data-f="role">角色</td><td data-f="award">奖项</td><td data-f="time">时间</td></tr></table>
+    <table class="comp-table">
+      <tr><td data-f="name">某某程序设计竞赛</td><td data-f="role">队员</td><td data-f="award">省级二等奖</td><td data-f="time">2024</td></tr>
+      <tr><td data-f="name">某某数学建模竞赛</td><td data-f="role">队员</td><td data-f="award">校级一等奖</td><td data-f="time">2023</td></tr>
+      <tr><td data-f="name">某某挑战杯</td><td data-f="role">成员</td><td data-f="award">校级三等奖</td><td data-f="time">2022</td></tr>
+    </table>
   </section>`;
 }
 
-function honorsHtml() {
-  return `<section class="module" data-module="honors">
-    ${titleIcon("fa-certificate", "所获荣誉")}
-    <ul class="honors"><li><strong data-f="name">荣誉名称</strong>（<span data-f="year">年份</span>）</li></ul>
-  </section>`;
+function honorsHtml(stage, purpose) {
+  const keys = modulesFor(stage, purpose);
+  const thin = !keys.includes("publication") && !keys.includes("projects");
+  const items =
+    stage === "博士"
+      ? [
+          ["博士研究生国家奖学金", "2025"],
+          ["某某学术会议最佳海报", "2024"],
+          ["某某实验室年度报告奖", "2023"],
+        ]
+      : stage === "硕士"
+        ? [
+            ["研究生学业奖学金", "2025"],
+            ["某某大学优秀研究生", "2024"],
+            ["某某学术论坛优秀报告", "2025"],
+          ]
+        : [
+            ["某某学校三好学生", "2023"],
+            ["某某奖学金", "2022"],
+            ["优秀学生干部", "2021"],
+            ["某某竞赛校级奖", "2024"],
+          ];
+  const take = thin ? 9 : keys.includes("publication") ? 4 : 6;
+  const lis = items
+    .slice(0, take)
+    .map(([name, year]) => `<li><strong data-f="name">${name}</strong>（<span data-f="year">${year}</span>）</li>`)
+    .join("");
+  return `<section class="module" data-module="honors">${titleIcon("fa-certificate", "所获荣誉")}<ul class="honors">${lis}</ul></section>`;
 }
 
-function othersHtml() {
-  return `<section class="module others" data-module="others">
-    ${titleIcon("fa-circle-info", "其他")}
-    <ul><li data-f="text">主页 / 可公开说明</li></ul>
-  </section>`;
+function othersHtml(stage, purpose) {
+  const keys = modulesFor(stage, purpose);
+  const n = keys.length;
+  const thin = !keys.includes("publication") && !keys.includes("projects");
+  const bank =
+    purpose === "求职"
+      ? [
+          "期望工作城市：某某市。",
+          "可随时到岗，也能按安排实习。",
+          "个人主页：https://example.com。",
+        ]
+      : [
+          "个人主页：https://example.com。",
+          "曾在某某实验室参加组会，并做过一次文献报告。",
+          "可在这里补充开源、审稿或其他经历。",
+        ];
+  const take = thin ? 8 : n <= 4 ? 8 : 4;
+  const items = bank.slice(0, take).map((t) => `<li data-f="text">${t}</li>`).join("");
+  return `<section class="module others" data-module="others">${titleIcon("fa-circle-info", "其他")}<ul>${items}</ul></section>`;
 }
 
 function modulesFor(stage, purpose) {
@@ -229,14 +455,14 @@ function moduleFactory(stage, purpose) {
   const s = normalizeStage(stage);
   const p = normalizePurpose(purpose);
   return {
-    personal: personalHtml,
+    personal: () => personalHtml(s, p),
     education: () => educationHtml(s),
-    publication: publicationHtml,
-    projects: () => projectsHtml(p),
-    skills: skillsHtml,
+    publication: () => publicationHtml(s, p),
+    projects: () => projectsHtml(s, p),
+    skills: () => skillsHtml(s, p),
     competitions: competitionsHtml,
-    honors: honorsHtml,
-    others: othersHtml,
+    honors: () => honorsHtml(s, p),
+    others: () => othersHtml(s, p),
   };
 }
 
@@ -265,10 +491,11 @@ function applyPreset(stage, purpose) {
   keep.forEach((_, k) => paperOrder.push(k));
   const keptOrder = paperOrder.filter((k) => keys.includes(k));
   const newcomers = keys.filter((k) => !keptOrder.includes(k));
+  const rebuild = state.config.demoFill !== false;
   const html = [...keptOrder, ...newcomers]
     .map((k) => {
-      if (keep.has(k)) return keep.get(k).outerHTML;
-      if (state.moduleStash.has(k)) {
+      if (!rebuild && keep.has(k)) return keep.get(k).outerHTML;
+      if (!rebuild && state.moduleStash.has(k)) {
         const html = state.moduleStash.get(k);
         state.moduleStash.delete(k);
         return html;
@@ -295,7 +522,7 @@ function applyPreset(stage, purpose) {
 
 function refreshAvatarUi() {
   const src = state.config.avatarImage || "";
-  const ok = src.startsWith("data:") || (src && !src.endsWith("avatar.png"));
+  const ok = src.startsWith("data:") || (src && !/avatar\.png$/i.test(src));
   $$("[data-avatar]").forEach((wrap) => {
     wrap.hidden = !state.config.needAvatar;
     wrap.classList.toggle("is-empty", !ok);
@@ -498,7 +725,7 @@ function applyConfig() {
   document.body.classList.toggle("use-system-font", !!c.useDefaultFont);
 
   $$(".page").forEach((page) => {
-    page.classList.toggle("theme-image", c.useDefaultTheme !== false);
+    page.classList.toggle("theme-image", c.useDefaultTheme === true);
     page.classList.toggle("has-watermark", !!c.needWatermark);
     const logo = $("[data-logo]", page);
     const name = $("[data-school-name]", page);
@@ -1400,6 +1627,7 @@ function parsePersonalRows() {
   }
   return parsed.map((r) => {
     if (!r.value && r.bind && state.config[r.bind]) r.value = state.config[r.bind];
+    if (isPersonalHint(r.bind, r.label, r.value)) r.value = "";
     return r;
   });
 }
@@ -1407,21 +1635,33 @@ function parsePersonalRows() {
 function renderPersonalForm() {
   const rows = parsePersonalRows();
   const fields = rows
-    .map(
-      (r, i) =>
-        `<div class="hud-entry" data-row="${i}">
-          <div class="hud-entry-bar">
+    .map((r, i) => {
+      const hint = personalHint(r.bind, r.label);
+      return `<div class="hud-entry is-drag" data-row="${i}">
+          <div class="hud-entry-bar" draggable="true">
+            <span class="hud-drag" draggable="true" aria-hidden="true"></span>
             <input class="hud-col-title" data-name="l${i}" value="${escHtml(r.label)}" title="点击修改栏目名">
             <button type="button" data-del="${i}">−</button>
           </div>
-          <div class="hud-field"><input data-name="v${i}" value="${escHtml(r.value)}" placeholder="${escHtml(r.label)}"></div>
+          <div class="hud-field"><input data-name="v${i}" value="${escHtml(r.value)}" placeholder="${escHtml(hint)}"></div>
           <input type="hidden" data-name="b${i}" value="${escHtml(r.bind)}">
-        </div>`
-    )
+        </div>`;
+    })
     .join("");
   return `${fields}<button type="button" class="hud-wide" data-add>＋ 增加栏目</button>
     <button type="button" class="hud-wide" data-avatar-btn>上传证件照</button>
-    <p class="hud-note">点栏目名可改名。校徽在侧栏「页眉」里选学校，或上传白/透明底 PNG、SVG。</p>`;
+    <p class="hud-note">拖动卡片可改顺序。点栏目名可改名。校徽在侧栏「页眉」里选学校，或上传白/透明底 PNG、SVG。</p>`;
+}
+
+function reindexFillRows(form) {
+  $$("[data-row]", form).forEach((el, i) => {
+    el.setAttribute("data-row", String(i));
+    const del = el.querySelector("[data-del]");
+    if (del) del.setAttribute("data-del", String(i));
+    el.querySelectorAll("[data-name]").forEach((inp) => {
+      inp.setAttribute("data-name", inp.getAttribute("data-name").replace(/\d+$/, String(i)));
+    });
+  });
 }
 
 function writePersonal(form) {
@@ -1433,7 +1673,9 @@ function writePersonal(form) {
   }));
   const known = { name: 1, city: 1, birthdate: 1, contact: 1 };
   rows.forEach((r) => {
-    if (r.bind && known[r.bind]) state.config[r.bind] = r.value;
+    if (r.bind && known[r.bind]) {
+      state.config[r.bind] = isPersonalHint(r.bind, r.label, r.value) ? "" : r.value.trim();
+    }
   });
   const mod = firstMod("personal");
   if (!mod) return;
@@ -1441,13 +1683,14 @@ function writePersonal(form) {
   if (!table) return;
   const cells = rows.map((r) => {
     const bind = r.bind && known[r.bind] ? ` data-bind="${r.bind}"` : "";
-    return `<td class="label"><span data-info-label>${escHtml(r.label)}</span>:</td><td${bind}>${escHtml(r.value)}</td>`;
+    const shown = isPersonalHint(r.bind, r.label, r.value) ? personalHint(r.bind, r.label) : r.value.trim();
+    return `<td class="label"><span data-info-label>${escHtml(r.label)}</span>:</td><td${bind}>${escHtml(shown)}</td>`;
   });
   let html = "";
   for (let i = 0; i < cells.length; i += 2) {
     html += `<tr>${cells[i]}${cells[i + 1] || "<td></td><td></td>"}</tr>`;
   }
-  table.innerHTML = html || `<tr><td class="label"><span data-info-label>姓名</span>:</td><td data-bind="name"></td></tr>`;
+  table.innerHTML = html || `<tr><td class="label"><span data-info-label>姓名</span>:</td><td data-bind="name">${PERSONAL_HINT.name}</td></tr>`;
   syncInfoLabelWidth();
   applyDocTitle();
 }
@@ -1712,6 +1955,49 @@ function bindFillForm(form, key) {
       if (e.target.matches('[data-name="schoolLogoChoice"], [data-name="headerDeptMode"]')) openFill(k);
     });
     form.addEventListener("click", onFillFormClick);
+    form.addEventListener("dragstart", (e) => {
+      if (state.fillKey !== "personal") return;
+      const bar = e.target.closest(".hud-entry-bar");
+      const row = e.target.closest(".hud-entry.is-drag");
+      if (!bar || !row || e.target.closest("button, input, textarea, select")) {
+        if (state.fillKey === "personal") e.preventDefault();
+        return;
+      }
+      state.dragKey = row.getAttribute("data-row");
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", state.dragKey);
+    });
+    form.addEventListener("dragover", (e) => {
+      if (state.fillKey !== "personal" || state.dragKey == null || state.dragKey === "") return;
+      const row = e.target.closest(".hud-entry.is-drag");
+      if (!row) return;
+      e.preventDefault();
+      $$(".hud-entry", form).forEach((r) => r.classList.toggle("is-over", r === row && r.getAttribute("data-row") !== state.dragKey));
+    });
+    form.addEventListener("drop", (e) => {
+      if (state.fillKey !== "personal") return;
+      const row = e.target.closest(".hud-entry.is-drag");
+      e.preventDefault();
+      $$(".hud-entry", form).forEach((r) => r.classList.remove("is-over"));
+      const from = state.dragKey;
+      const to = row?.getAttribute("data-row");
+      state.dragKey = "";
+      if (from == null || from === "" || to == null || from === to) return;
+      const rows = $$("[data-row]", form);
+      const a = rows.find((el) => el.getAttribute("data-row") === from);
+      const b = rows.find((el) => el.getAttribute("data-row") === to);
+      if (!a || !b) return;
+      const pos = rows.indexOf(b);
+      const fromPos = rows.indexOf(a);
+      if (fromPos < pos) b.after(a);
+      else b.before(a);
+      reindexFillRows(form);
+      applyFill("personal", form);
+    });
+    form.addEventListener("dragend", () => {
+      state.dragKey = "";
+      $$(".hud-entry", form).forEach((r) => r.classList.remove("is-over"));
+    });
   }
 }
 
@@ -1756,7 +2042,7 @@ function onFillFormClick(e) {
       if (table) {
         table.insertAdjacentHTML(
           "beforeend",
-          `<tr><td class="label"><span data-info-label>新栏目</span>:</td><td></td></tr>`
+          `<tr><td class="label"><span data-info-label>新栏目</span>:</td><td>栏目内容</td></tr>`
         );
       }
     } else if (key === "education") {
@@ -1764,30 +2050,30 @@ function onFillFormClick(e) {
     } else if (key === "publication") {
       firstMod("publication")?.insertAdjacentHTML(
         "beforeend",
-        `<article class="entry"><div data-f="title">论文标题</div><div class="spread"><div><strong data-f="authors"></strong></div><div><span class="pub-venue" data-f="venue"></span>（<span data-f="status"></span>）</div></div></article>`
+        `<article class="entry"><div data-f="title">论文标题</div><div class="spread"><div><strong data-f="authors">姓名</strong></div><div><span class="pub-venue" data-f="venue">会议/期刊</span>（<span data-f="status">状态</span>）</div></div></article>`
       );
     } else if (key === "projects") {
       firstMod("projects")?.insertAdjacentHTML(
         "beforeend",
-        `<article class="entry"><div class="spread"><div><strong class="lg" data-f="name">项目名称</strong></div><div class="meta" data-f="kind"></div></div><div class="spread"><div><strong data-f="role"></strong></div><div class="meta" data-f="dates"></div></div></article>`
+        `<article class="entry"><div class="spread"><div><strong class="lg" data-f="name">项目名称</strong></div><div class="meta" data-f="kind">类型</div></div><div class="spread"><div><strong data-f="role">角色</strong></div><div class="meta" data-f="dates">起止时间</div></div></article>`
       );
     } else if (key === "skills") {
       $("ul", firstMod("skills"))?.insertAdjacentHTML(
         "beforeend",
-        `<li><strong data-f="label">新技能</strong>：<span data-f="value"></span></li>`
+        `<li><strong data-f="label">新技能</strong>：<span data-f="value">如 Python、英语</span></li>`
       );
     } else if (key === "competitions") {
       $("table", firstMod("competitions"))?.insertAdjacentHTML(
         "beforeend",
-        `<tr><td data-f="name"></td><td data-f="role"></td><td data-f="award"></td><td data-f="time"></td></tr>`
+        `<tr><td data-f="name">竞赛名称</td><td data-f="role">角色</td><td data-f="award">奖项</td><td data-f="time">时间</td></tr>`
       );
     } else if (key === "honors") {
       $("ul", firstMod("honors"))?.insertAdjacentHTML(
         "beforeend",
-        `<li><strong data-f="name">荣誉名称</strong>（<span data-f="year"></span>）</li>`
+        `<li><strong data-f="name">荣誉名称</strong>（<span data-f="year">年份</span>）</li>`
       );
     } else if (key === "others") {
-      $("ul", firstMod("others"))?.insertAdjacentHTML("beforeend", `<li data-f="text"></li>`);
+      $("ul", firstMod("others"))?.insertAdjacentHTML("beforeend", `<li data-f="text">主页 / 可公开说明</li>`);
     }
     openFill(key);
     return;
@@ -1796,7 +2082,7 @@ function onFillFormClick(e) {
     const i = Number(del.getAttribute("data-del"));
     const row = form.querySelector(`[data-row="${i}"]`);
     if (row) row.remove();
-    $$("[data-row]", form).forEach((el, idx) => el.setAttribute("data-row", String(idx)));
+    reindexFillRows(form);
     applyFill(key, form);
     openFill(key);
   }
@@ -1916,7 +2202,7 @@ async function main() {
   bindLogo();
   bindFillUi();
   await document.fonts.ready;
-  if (isOnlineDemo() && !localStorage.getItem(STORE_PAGES)) {
+  if ((isOnlineDemo() && !localStorage.getItem(STORE_PAGES)) || state.config.demoFill) {
     applyPreset(state.config.academicStage || "", state.config.cvPurpose || "");
   } else {
     packPages();

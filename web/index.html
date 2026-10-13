@@ -13,7 +13,7 @@
   <aside class="hud" aria-label="简历填写">
     <div class="hud-rail">
       <p class="hud-brand" data-doc-title>简历</p>
-      <p class="hud-lead">如果有帮到你，请给我一个免费的<a href="https://github.com/yanboc/yanboc-cv" target="_blank" rel="noopener">星星🌟</a></p>
+      <p class="hud-lead">网页版功能限制，推荐下载到本地使用。内容由 AI 生成仅用于占位。如果觉得有用，请给我一个免费的<a href="https://github.com/yanboc/cn-blue-cv" target="_blank" rel="noopener">星星🌟</a></p>
 
       <div class="hud-group hud-demo">
         <div class="hud-label">阶段与用途（自动匹配常用模块）</div>
@@ -115,42 +115,28 @@
             <div class="info-wrap">
               <table class="info-table">
                 <tr>
-                  <td class="label">姓　　名:</td>
-                  <td data-bind="name"></td>
-                  <td class="label">所在城市:</td>
-                  <td data-bind="city"></td>
+                  <td class="label"><span data-info-label>姓名</span>:</td>
+                  <td data-bind="name">某某</td>
+                  <td class="label"><span data-info-label>所在城市</span>:</td>
+                  <td data-bind="city">你的城市</td>
                 </tr>
                 <tr>
-                  <td class="label">出生年月:</td>
-                  <td data-bind="birthdate"></td>
-                  <td class="label">联系方式:</td>
-                  <td data-bind="contact"></td>
+                  <td class="label"><span data-info-label>出生年月</span>:</td>
+                  <td data-bind="birthdate">2000.01</td>
+                  <td class="label"><span data-info-label>联系方式</span>:</td>
+                  <td data-bind="contact">你的手机或邮箱</td>
+                </tr>
+                <tr>
+                  <td class="label"><span data-info-label>当前状态</span>:</td>
+                  <td>博士在读</td>
+                  <td class="label"><span data-info-label>研究兴趣</span>:</td>
+                  <td>你的研究方向</td>
                 </tr>
               </table>
-              <div class="avatar is-empty" data-avatar>
-                <img alt="证件照">
-              </div>
             </div>
-          </section>
-          <section class="module" data-module="education">
-            <h2 class="module-title"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i>教育背景</h2>
-            <article class="entry">
-              <div class="spread"><div><strong class="lg" data-f="school">学校</strong>，<span data-f="degree">学位</span></div><div class="meta" data-f="location">位置</div></div>
-              <div class="spread"><div><u data-f="college">学院</u>，专业：<span data-f="major">专业名</span></div><div class="meta" data-f="dates">起止时间</div></div>
-            </article>
-          </section>
-          <section class="module" data-module="projects">
-            <h2 class="module-title"><i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i>项目与实习</h2>
-            <article class="entry">
-              <div class="spread"><div><strong class="lg">项目或实习名称</strong></div><div class="meta">类型</div></div>
-              <div class="spread"><div><strong>角色</strong></div><div class="meta">起止时间</div></div>
-            </article>
-          </section>
-          <section class="module others" data-module="others">
-            <h2 class="module-title"><i class="fa-solid fa-circle-info" aria-hidden="true"></i>其他</h2>
-            <ul>
-              <li>在此填写</li>
-            </ul>
+            <div class="avatar" data-avatar>
+              <img src="images/profile.jpg" alt="证件照">
+            </div>
           </section>
         </div>
         <footer class="page-footer" data-module="footer"></footer>
